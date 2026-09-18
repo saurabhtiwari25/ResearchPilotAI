@@ -15,7 +15,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Create directories for runtime data
-RUN mkdir -p /app/uploads /app/chroma_data
+RUN mkdir -p /app/uploads /app/data
 
 # Expose FastAPI port
 EXPOSE 8000

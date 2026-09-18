@@ -5,9 +5,13 @@ Integrates with Tavily Search API for optional web context enrichment.
 Returns clean, structured snippets suitable for RAG context injection.
 """
 
+import logging
+
 from tavily import TavilyClient
 
 import config
+
+logger = logging.getLogger("researchpilot.search")
 
 
 def search_web(query: str, max_results: int = config.TAVILY_MAX_RESULTS) -> list[dict]:
@@ -24,6 +28,7 @@ def search_web(query: str, max_results: int = config.TAVILY_MAX_RESULTS) -> list
     Returns an empty list if the API key is not configured or the search fails.
     """
     if not config.TAVILY_API_KEY:
+        logger.warning("Tavily API key not configured — skipping web search.")
         return []
 
     try:
@@ -42,8 +47,9 @@ def search_web(query: str, max_results: int = config.TAVILY_MAX_RESULTS) -> list
                 "snippet": item.get("content", ""),
             })
 
+        logger.info("Tavily search returned %d results for: '%s...'", len(results), query[:60])
         return results
 
     except Exception as e:
-        print(f"[search] Tavily search failed: {e}")
+        logger.exception("Tavily search failed: %s", e)
         return []
